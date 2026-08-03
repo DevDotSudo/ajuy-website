@@ -1,0 +1,21 @@
+export const municipality = {
+  name: "Municipality of Ajuy",
+  localName: "Banwa sang Ajuy",
+  province: "Iloilo",
+  region: "Western Visayas",
+  district: "5th District",
+  classification: "1st income class municipality",
+  psgc: "0603001000",
+  correspondenceCode: "063001000",
+  zipCode: "5012",
+  population2024: 54100,
+  barangayCount: 34,
+  language: "Hiligaynon",
+  mayor: "Loida J. Espinosa",
+  viceMayor: "Jett C. Rojas",
+  email: "ajuy_lgu@yahoo.com",
+  phones: ["+63 33 392 0408", "+63 33 393 0342"],
+  address: "Municipal Hall, Poblacion, Ajuy, Iloilo 5012",
+  description:
+    "Ajuy is a coastal municipality in northern Iloilo made up of 34 barangays. The website brings together public information, local contacts, barangay data, culture, destinations, and population records in one clear place.",
+};

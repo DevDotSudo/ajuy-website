@@ -1,0 +1,22 @@
+import fs from "node:fs";
+
+const barangayText = fs.readFileSync(new URL("../data/barangays.ts", import.meta.url), "utf8");
+const populationText = fs.readFileSync(new URL("../data/population.ts", import.meta.url), "utf8");
+const attractionText = fs.readFileSync(new URL("../data/attractions.ts", import.meta.url), "utf8");
+const extractJsonArray = (text) => { const start = text.indexOf("= [") + 2; return JSON.parse(text.slice(start, text.lastIndexOf("]") + 1)); };
+const barangays = extractJsonArray(barangayText);
+const population = extractJsonArray(populationText);
+const total = barangays.reduce((sum, item) => sum + item.population, 0);
+const uniqueNames = new Set(barangays.map((item) => item.name));
+const uniqueCodes = new Set(barangays.map((item) => item.psgc));
+if (barangays.length !== 34) throw new Error(`Expected 34 barangays, found ${barangays.length}`);
+if (total !== 54100) throw new Error(`Expected total 54100, found ${total}`);
+if (uniqueNames.size !== barangays.length || uniqueCodes.size !== barangays.length) throw new Error("Barangay names and codes must be unique");
+if (population.length !== 16) throw new Error(`Expected 16 population observations, found ${population.length}`);
+for (let index = 1; index < population.length; index += 1) if (population[index].year <= population[index - 1].year) throw new Error("Population years must increase");
+const attractionSlugs = [...attractionText.matchAll(/slug:\s*"([^"]+)"/g)].map((match) => match[1]);
+const mapQueries = [...attractionText.matchAll(/mapQuery:\s*"([^"]+)"/g)].map((match) => match[1]);
+if (attractionSlugs.length < 10) throw new Error(`Expected at least 10 attractions, found ${attractionSlugs.length}`);
+if (new Set(attractionSlugs).size !== attractionSlugs.length) throw new Error("Attraction slugs must be unique");
+if (mapQueries.length !== attractionSlugs.length) throw new Error("Every attraction needs a map query");
+console.log(`Data valid: ${barangays.length} barangays, ${population.length} population observations, ${attractionSlugs.length} attractions, total ${total}.`);
