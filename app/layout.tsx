@@ -36,6 +36,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en-PH">
+      <head>
+        <link rel="icon" type="image/png" sizes="32x32" href="/images/ajuy-seal.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/images/ajuy-seal.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/images/ajuy-seal.png" />
+        <link rel="shortcut icon" href="/images/ajuy-seal.png" />
+      </head>
       <body>
         <a className="skip-link" href="#main-content">Skip to main content</a>
         <SiteHeader />

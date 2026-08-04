@@ -33,6 +33,17 @@ export function SiteHeader() {
 
   useEffect(() => setOpen(false), [pathname]);
 
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [open]);
+
   const exploreActive = exploreLinks.some(([href]) => pathname === href);
 
   return (
