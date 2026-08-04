@@ -74,7 +74,29 @@ h3 { font-size: 1.35rem; }
 
 .quick-grid > *, .service-journey-grid > *, .updates-grid > *, .facts-grid > *, .culture-grid > *, .service-grid > *, .barangay-grid > *, .analytics-stats > *, .official-grid > *, .footer-main > *, .profile-economy-grid > * { min-width: 0; }
 .home-hero-grid > *, .split-intro > *, .population-feature > *, .map-home-grid > *, .image-story > *, .contact-layout > *, .analytics-two > *, .profile-population-layout > * { min-width: 0; }
+.chat-map-unavailable {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  padding: 24px;
+  background: #eef5ec;
+  color: #2f6b3f;
+  text-align: center;
+  font-size: 0.9rem;
+}
 
+.chat-map-attribution {
+  display: inline-flex;
+  margin-top: 8px;
+  color: #5e5e5e;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.chat-map-attribution:hover {
+  text-decoration: underline;
+}
 
 .site-header { position: sticky; top: 0; z-index: 150; background: rgba(255,253,247,.92); backdrop-filter: blur(18px); border-bottom: 1px solid rgba(219,231,216,.85); box-shadow: 0 8px 30px rgba(15,45,24,.06); }
 .government-bar { background: var(--green-deep); color: #d8e8da; font-size: .72rem; }

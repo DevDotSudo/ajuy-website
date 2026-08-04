@@ -30,9 +30,14 @@ const common = new Set([
 export type ChatLocation = {
   id: string;
   name: string;
-  kind: "Barangay" | "Attraction";
+  kind:
+    | "Barangay"
+    | "Attraction"
+    | "Place";
   query: string;
   detail: string;
+  placeId?: string;
+  mapsUrl?: string;
 };
 
 const locationIntent = /\b(where|location|located|locate|map|direction|directions|route|how to get|how do i get|show me)\b/i;

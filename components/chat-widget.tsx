@@ -6,9 +6,11 @@ import { CloseIcon, MapIcon, SendIcon, SparkIcon } from "@/components/icons";
 type ChatLocation = {
   id: string;
   name: string;
-  kind: "Barangay" | "Attraction";
+  kind: "Barangay" | "Attraction" | "Place";
   query: string;
   detail: string;
+  placeId?: string;
+  mapsUrl?: string;
 };
 
 type Message = {
@@ -21,38 +23,189 @@ type MapStyle = "roadmap" | "satellite";
 
 const starters = ["Where is Nasidman Island?", "Locate Barangay Culasi", "What is Ajuy's population?", "What are the emergency contacts?"];
 
-function embedUrl(query: string, mapStyle: MapStyle) {
-  const type = mapStyle === "satellite" ? "k" : "m";
-  return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed&t=${type}&z=15`;
+function embedUrl(
+  location: ChatLocation,
+  mapStyle: MapStyle,
+) {
+  const apiKey =
+    process.env
+      .NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY;
+
+  if (!apiKey) {
+    return "";
+  }
+
+  const query = location.placeId
+    ? `place_id:${location.placeId}`
+    : `${location.name}, Ajuy, Iloilo, Philippines`;
+
+  return (
+    "https://www.google.com/maps/embed/v1/place" +
+    `?key=${encodeURIComponent(apiKey)}` +
+    `&q=${encodeURIComponent(query)}` +
+    "&zoom=16" +
+    `&maptype=${mapStyle}` +
+    "&language=en" +
+    "&region=PH"
+  );
 }
 
-function mapsUrl(query: string) {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+function mapsUrl(
+  location: ChatLocation,
+) {
+  if (location.mapsUrl) {
+    return location.mapsUrl;
+  }
+
+  const base =
+    "https://www.google.com/maps/search/?api=1" +
+    `&query=${encodeURIComponent(
+      location.query,
+    )}`;
+
+  if (!location.placeId) {
+    return base;
+  }
+
+  return (
+    base +
+    `&query_place_id=${encodeURIComponent(
+      location.placeId,
+    )}`
+  );
 }
 
-function ChatLocationCard({ location }: { location: ChatLocation }) {
-  const [mapStyle, setMapStyle] = useState<MapStyle>("roadmap");
+
+function ChatLocationCard({
+  location,
+}: {
+  location: ChatLocation;
+}) {
+  const [mapStyle, setMapStyle] =
+    useState<MapStyle>("roadmap");
+
+  const mapSource = embedUrl(
+    location,
+    mapStyle,
+  );
+
+  const googleMapsUrl =
+    mapsUrl(location);
 
   return (
     <div className="chat-location-card">
       <div className="chat-location-head">
-        <div><span>{location.kind}</span><strong>{location.name}</strong><small>{location.detail}</small></div>
-        <div className="chat-map-switch" role="group" aria-label={`Map style for ${location.name}`}>
-          <button className={mapStyle === "roadmap" ? "active" : ""} onClick={() => setMapStyle("roadmap")} aria-pressed={mapStyle === "roadmap"}>Map</button>
-          <button className={mapStyle === "satellite" ? "active" : ""} onClick={() => setMapStyle("satellite")} aria-pressed={mapStyle === "satellite"}>Satellite</button>
+        <div>
+          <span>{location.kind}</span>
+          <strong>
+            {location.name}
+          </strong>
+          <small>
+            {location.detail}
+          </small>
+        </div>
+
+        <div
+          className="chat-map-switch"
+          role="group"
+          aria-label={`Map style for ${location.name}`}
+        >
+          <button
+            type="button"
+            className={
+              mapStyle === "roadmap"
+                ? "active"
+                : ""
+            }
+            onClick={() =>
+              setMapStyle("roadmap")
+            }
+            aria-pressed={
+              mapStyle === "roadmap"
+            }
+          >
+            Map
+          </button>
+
+          <button
+            type="button"
+            className={
+              mapStyle === "satellite"
+                ? "active"
+                : ""
+            }
+            onClick={() =>
+              setMapStyle("satellite")
+            }
+            aria-pressed={
+              mapStyle === "satellite"
+            }
+          >
+            Satellite
+          </button>
         </div>
       </div>
-      <iframe key={`${location.id}-${mapStyle}`} title={`Map of ${location.name}`} src={embedUrl(location.query, mapStyle)} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+
+      {mapSource ? (
+        <iframe
+          key={`${location.id}-${mapStyle}`}
+          title={`Map of ${location.name}`}
+          src={mapSource}
+          loading="lazy"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+        />
+      ) : (
+        <div className="chat-map-unavailable">
+          Add your Google Maps Embed API
+          key to display this map.
+        </div>
+      )}
+
       <div className="chat-location-actions">
-        <a href={`/map?place=${encodeURIComponent(location.id)}`}><MapIcon /> View on Ajuy Map</a>
-        <a href={mapsUrl(location.query)} target="_blank" rel="noreferrer">Open Google Maps</a>
+        {!location.id.startsWith(
+          "gemini-",
+        ) && (
+          <a
+            href={`/map?place=${encodeURIComponent(
+              location.id,
+            )}`}
+          >
+            <MapIcon />
+            View on Ajuy Map
+          </a>
+        )}
+
+        <a
+          href={googleMapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Open Google Maps
+        </a>
       </div>
+
+      <a
+        className="chat-map-attribution"
+        href={googleMapsUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Source:{" "}
+        <span translate="no">
+          Google Maps
+        </span>
+      </a>
     </div>
   );
 }
 
-export function ChatWidget() {
-  const [open, setOpen] = useState(false);
+type ChatWidgetProps = {
+  fullPage?: boolean;
+};
+
+export function ChatWidget({ fullPage = false }: ChatWidgetProps) {
+  const [open, setOpen] = useState(fullPage);
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: "Hello! Ask me about Ajuy's barangays, population, attractions, culture, government services, offices, emergency contacts, or the location of a place." },
   ]);
