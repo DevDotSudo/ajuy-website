@@ -13,6 +13,16 @@ export const metadata: Metadata = {
   description: "Ajuy municipal information, barangays, local government, culture, attractions, maps, emergency contacts, and population data.",
   applicationName: "Municipality of Ajuy",
   category: "Government",
+  icons: {
+    icon: [
+      { url: "/images/ajuy-seal.png", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [
+      { url: "/images/ajuy-seal.png", sizes: "180x180", type: "image/png" },
+    ],
+    shortcut: "/images/ajuy-seal.png",
+  },
   openGraph: {
     type: "website",
     locale: "en_PH",
